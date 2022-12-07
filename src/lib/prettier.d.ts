@@ -1,12 +1,12 @@
 import 'prettier';
 
-// TODO: Update @types/prettier
+// TODO: Update @types/prettier instead
 declare module 'prettier' {
-    export type V3Parser<T = any> = Exclude<Parser<T>, 'parse'> & {
+    export type V3Parser<T = any> = Omit<Parser<T>, 'parse'> & {
         parse: (text: string, options: ParserOptions<T>) => Promise<T>;
     };
 
-    export type V3Printer<T = any> = Exclude<Printer<T>, 'embed'> & {
+    export type V3Printer<T = any> = Omit<Printer<T>, 'embed'> & {
         embed?(
             // Path to the current AST node
             path: AstPath,

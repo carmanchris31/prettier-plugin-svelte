@@ -1,5 +1,5 @@
 import test from 'ava';
-import { readdirSync, readFileSync, existsSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { format } from 'prettier';
 
 let dirs = readdirSync('test/formatting/samples');
@@ -22,7 +22,7 @@ for (const dir of dirs) {
     ).replace(/\r?\n/g, '\n');
     const options = readOptions(`test/formatting/samples/${dir}/options.json`);
 
-    test(`formatting: ${dir}`, (t) => {
+    test(`formatting: ${dir}`, async (t) => {
         let onTestCompleted;
 
         if ((options as any).expectSyntaxErrors) {
@@ -32,7 +32,7 @@ for (const dir of dirs) {
         try {
             const actualOutput = format(input, {
                 parser: 'svelte' as any,
-                plugins: [require.resolve('../../src')],
+                plugins: [await import('../../src')],
                 tabWidth: 4,
                 ...options,
             });
@@ -46,7 +46,7 @@ for (const dir of dirs) {
             // Reprint to check that another format outputs the same code
             const actualOutput2 = format(actualOutput, {
                 parser: 'svelte' as any,
-                plugins: [require.resolve('../../src')],
+                plugins: [await import('../../src')],
                 tabWidth: 4,
                 ...options,
             });

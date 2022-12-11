@@ -23,7 +23,7 @@ for (const file of files) {
     test(`printer: ${file.slice(0, file.length - `.${ending}`.length)}`, (t) => {
         const actualOutput = format(input, {
             parser: (ending === 'html' ? 'svelte' : 'markdown') as any,
-            plugins: [require.resolve('../../src')],
+            plugins: [await import('../../src')],
             tabWidth: 4,
             ...options,
         } as any);

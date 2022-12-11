@@ -3,7 +3,10 @@
         "target": "es6",
         "module": "commonjs",
         "strict": true,
+        "paths": {
+            "*": ["./@types/*"]
+        },
         "esModuleInterop": true
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*", "test"]
 }

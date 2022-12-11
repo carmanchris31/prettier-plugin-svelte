@@ -1,5 +1,5 @@
 import test from 'ava';
-import { readdirSync, readFileSync, existsSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { format } from 'prettier';
 
 let files = readdirSync('test/printer/samples').filter(
@@ -20,10 +20,10 @@ for (const file of files) {
         `test/printer/samples/${file.replace(`.${ending}`, '.options.json')}`,
     );
 
-    test(`printer: ${file.slice(0, file.length - `.${ending}`.length)}`, (t) => {
-        const actualOutput = format(input, {
+    test(`printer: ${file.slice(0, file.length - `.${ending}`.length)}`, async (t) => {
+        const actualOutput = await format(input, {
             parser: (ending === 'html' ? 'svelte' : 'markdown') as any,
-            plugins: [require.resolve('../../src')],
+            plugins: [await import('../../src')],
             tabWidth: 4,
             ...options,
         } as any);

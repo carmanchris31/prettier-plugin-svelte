@@ -27,4 +27,33 @@ declare module 'prettier' {
             | Doc
             | undefined;
     };
+
+    export function format(source: string, options?: Options): Promise<string>;
+
+    export function format(): Promise<string>
+    export function formatWithCursor(source: string, options: CursorOptions): Promise<CursorResult>;
+    export function check(source: string, options?: Options): Promise<boolean>
+    export function getSupportInfo(): Promise<SupportInfo>
+    export function clearConfigCache(): Promise<void>
+    namespace resolveConfig {
+        // export function resolveConfig.sync is removed
+    }
+    namespace resolveConfigFile {
+        // export function resolveConfigFile.sync is removed
+    }
+    namespace getFileInfo {
+        // export function getFileInfo.sync is removed
+    }
+
+    export interface ParserOptions<T = any> extends Partial<RequiredOptions> {
+        locStart: (node: T) => number;
+        locEnd: (node: T) => number;
+        originalText: string;
+    }
+
+    export namespace doc {
+        namespace builders {
+            function join(sep: Doc, docs: Doc[]): Doc;
+        }
+    }
 }

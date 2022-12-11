@@ -1,9 +1,9 @@
-import { AstPath, Doc, doc, FastPath, Options, ParserOptions } from 'prettier';
+import { AstPath, Doc, doc, Options, ParserOptions } from 'prettier';
 import { getText } from './lib/getText';
 import { snippedTagContentAttribute } from './lib/snipTagContent';
 import { isBracketSameLine } from './options';
 import { PrintFn } from './print';
-import { isLine, removeParentheses, trimRight } from './print/doc-helpers';
+import { concat, isLine, removeParentheses, trimRight } from './print/doc-helpers';
 import { groupConcat, printWithPrependedAttributeLine } from './print/helpers';
 import {
     getAttributeTextValue,
@@ -12,26 +12,23 @@ import {
     isNodeSupportedLanguage,
     isPugTemplate,
     isTypeScript,
-    printRaw,
+    printRaw
 } from './print/node-helpers';
 import { ElementNode, Node, ScriptNode, StyleNode } from './print/nodes';
 
 const {
-    builders: { concat, hardline, softline, indent, dedent, literalline },
+    builders: { hardline, softline, indent, dedent, literalline },
     utils: { removeLines },
 } = doc;
 
-export function embed(path: FastPath, options: Options) {
+export function embed(_path: AstPath, _options: ParserOptions) {
     return async (
         textToDoc: (text: string, options: Options) => Promise<Doc>,
         print: (selector?: string | number | Array<string | number> | AstPath) => Doc,
-        _path: AstPath,
-        _options: Options,
+        path: AstPath,
+        options: ParserOptions,
     ) => {
         const node: Node = path.getNode();
-
-        // TODO: Figure out which is actually passed
-        const options = _options as ParserOptions;
 
         if (node.isJS) {
             try {
@@ -62,12 +59,12 @@ export function embed(path: FastPath, options: Options) {
             }
         }
 
-        const embedType = (
+        const embedType = async (
             tag: 'script' | 'style' | 'template',
             parser: 'typescript' | 'babel-ts' | 'css' | 'pug',
             isTopLevel: boolean,
         ) =>
-            embedTag(
+            await embedTag(
                 tag,
                 options.originalText,
                 path,
@@ -77,8 +74,8 @@ export function embed(path: FastPath, options: Options) {
                 options,
             );
 
-        const embedScript = (isTopLevel: boolean) =>
-            embedType(
+        const embedScript = async (isTopLevel: boolean) =>
+            await embedType(
                 'script',
                 // Use babel-ts as fallback because the absence does not mean the content is not TS,
                 // the user could have set the default language. babel-ts will format things a little
@@ -87,8 +84,8 @@ export function embed(path: FastPath, options: Options) {
                 isTypeScript(node) ? 'typescript' : 'babel-ts',
                 isTopLevel,
             );
-        const embedStyle = (isTopLevel: boolean) => embedType('style', 'css', isTopLevel);
-        const embedPug = () => embedType('template', 'pug', false);
+        const embedStyle = async (isTopLevel: boolean) => await embedType('style', 'css', isTopLevel);
+        const embedPug = async () => await embedType('template', 'pug', false);
 
         switch (node.type) {
             case 'Script':
@@ -128,7 +125,7 @@ function preformattedBody(str: string): Doc {
 
     // If we do not start with a new line prettier might try to break the opening tag
     // to keep it together with the string. Use a literal line to skip indentation.
-    return concat([literalline, str.replace(firstNewline, '').replace(lastNewline, ''), hardline]);
+    return [literalline, str.replace(firstNewline, '').replace(lastNewline, ''), hardline];
 }
 
 function getSnippedContent(node: Node) {
@@ -164,13 +161,13 @@ async function formatBodyContent(
                 .split('\n')
                 .map((line) => (line ? whitespace + line : line))
                 .join('\n');
-            return concat([hardline, pugBody]);
+            return [hardline, pugBody];
         }
 
         const indentIfDesired = (doc: Doc) =>
             options.svelteIndentScriptAndStyle ? indent(doc) : doc;
         trimRight([body], isLine);
-        return concat([indentIfDesired(concat([hardline, body])), hardline]);
+        return [indentIfDesired(concat([hardline, body])), hardline];
     } catch (error) {
         if (process.env.PRETTIER_DEBUG) {
             throw error;
@@ -189,7 +186,7 @@ async function formatBodyContent(
 async function embedTag(
     tag: 'script' | 'style' | 'template',
     text: string,
-    path: FastPath,
+    path: AstPath,
     formatBodyContent: (content: string) => Promise<Doc>,
     print: PrintFn,
     isTopLevel: boolean,
@@ -233,9 +230,9 @@ async function embedTag(
         // node tree. if there is a comment referring to it, it must be recreated at
         // the new position.
         if (previousComment) {
-            result = concat(['<!--', previousComment.data, '-->', hardline, result, hardline]);
+            result = ['<!--', previousComment.data, '-->', hardline, result, hardline];
         } else {
-            result = concat([result, hardline]);
+            result = [result, hardline];
         }
     }
 

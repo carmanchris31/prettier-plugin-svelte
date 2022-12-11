@@ -1,3 +1,7 @@
+import { AstPath, Doc, doc, ParserOptions } from 'prettier';
+import { PrintFn } from '.';
+import { formattableAttributes } from '../lib/elements';
+import { snippedTagContentAttribute } from '../lib/snipTagContent';
 import {
     ASTNode,
     AttributeNode,
@@ -12,12 +16,8 @@ import {
     SlotTemplateNode,
     StyleNode,
     TitleNode,
-    WindowNode,
+    WindowNode
 } from './nodes';
-import { Doc, doc, FastPath, ParserOptions } from 'prettier';
-import { formattableAttributes } from '../lib/elements';
-import { PrintFn } from '.';
-import { snippedTagContentAttribute } from '../lib/snipTagContent';
 
 /**
  * Determines whether or not given node
@@ -27,7 +27,7 @@ export function isASTNode(n: any): n is ASTNode {
     return n && n.__isRoot;
 }
 
-export function isPreTagContent(path: FastPath): boolean {
+export function isPreTagContent(path: AstPath): boolean {
     const stack = path.stack as Node[];
 
     return stack.some(
@@ -67,8 +67,8 @@ export function replaceEndOfLineWith(text: string, replacement: Doc) {
 }
 
 export function groupConcat(contents: doc.builders.Doc[]): doc.builders.Doc {
-    const { concat, group } = doc.builders;
-    return group(concat(contents));
+    const { group } = doc.builders;
+    return group(contents);
 }
 
 export function getAttributeLine(
@@ -84,7 +84,7 @@ export function getAttributeLine(
         | BodyNode
         | OptionsNode
         | SlotTemplateNode,
-    options: ParserOptions,
+    options: ParserOptions & { singleAttributePerLine?: boolean },
 ) {
     const { hardline, line } = doc.builders;
     const hasThisBinding =
@@ -118,6 +118,6 @@ export function printWithPrependedAttributeLine(
 ): PrintFn {
     return (path) =>
         path.getNode().name !== snippedTagContentAttribute
-            ? doc.builders.concat([getAttributeLine(node, options), path.call(print)])
+            ? [getAttributeLine(node, options), path.call(print)]
             : '';
 }

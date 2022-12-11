@@ -58,7 +58,8 @@ export function isEmptyDoc(doc: Doc): boolean {
     }
 
     if (isDocCommand(doc) && doc.type === 'line') {
-        return !doc.keepIfLonely;
+        // TODO: did this ever exist?
+        return !(doc as {keepIfLonely?: boolean}).keepIfLonely;
     }
 
     // Since Prettier 2.3.0, concats are represented as flat arrays
@@ -164,4 +165,8 @@ function getParts(doc: Doc): Doc[] | undefined {
  */
 export function removeParentheses(doc: Doc): Doc {
     return trim([doc], (_doc: Doc) => _doc === '(' || _doc === ')')[0];
+}
+
+export function concat(docs: Doc[]): Doc {
+    return docs
 }

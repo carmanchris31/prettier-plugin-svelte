@@ -30,7 +30,7 @@ for (const dir of dirs) {
         }
 
         try {
-            const actualOutput = format(input, {
+            const actualOutput = await format(input, {
                 parser: 'svelte' as any,
                 plugins: [await import('../../src')],
                 tabWidth: 4,
@@ -44,7 +44,7 @@ for (const dir of dirs) {
             );
 
             // Reprint to check that another format outputs the same code
-            const actualOutput2 = format(actualOutput, {
+            const actualOutput2 = await format(actualOutput, {
                 parser: 'svelte' as any,
                 plugins: [await import('../../src')],
                 tabWidth: 4,

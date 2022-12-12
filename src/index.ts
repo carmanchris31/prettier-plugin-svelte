@@ -1,8 +1,8 @@
-import { SupportLanguage, Parser, Printer } from 'prettier';
-import { print } from './print';
-import { ASTNode } from './print/nodes';
+import { Parser, Printer, SupportLanguage } from 'prettier';
 import { embed } from './embed';
 import { snipScriptAndStyleTagContent } from './lib/snipTagContent';
+import { print } from './print';
+import { ASTNode } from './print/nodes';
 
 function locStart(node: any) {
     return node.start;
@@ -23,7 +23,7 @@ export const languages: Partial<SupportLanguage>[] = [
 
 export const parsers: Record<string, Parser> = {
     svelte: {
-        parse: (text) => {
+        parse: async (text) => {
             try {
                 return <ASTNode>{ ...require(`svelte/compiler`).parse(text), __isRoot: true };
             } catch (err: any) {

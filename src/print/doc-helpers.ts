@@ -159,3 +159,11 @@ function getParts(doc: Doc): Doc[] | undefined {
 export function removeParentheses(doc: Doc): Doc {
     return trim([doc], (_doc: Doc) => _doc === '(' || _doc === ')')[0];
 }
+
+export function ensureArray(doc: Doc): Doc[] {
+    if (Array.isArray(doc)) {
+        return doc;
+    }
+
+    return [doc];
+}

@@ -4,7 +4,7 @@ import { extractAttributes } from '../lib/extractAttributes';
 import { getText } from '../lib/getText';
 import { hasSnippedContent, unsnipContent } from '../lib/snipTagContent';
 import { isBracketSameLine, parseSortOrder, SortOrderPart } from '../options';
-import { isEmptyDoc, isLine, trim, trimRight } from './doc-helpers';
+import { ensureArray, isEmptyDoc, isLine, trim, trimRight } from './doc-helpers';
 import {
     flatten,
     getAttributeLine,
@@ -1124,9 +1124,9 @@ function prepareChildren(
  */
 function splitTextToDocs(node: TextNode): Doc[] {
     const text = getUnencodedText(node);
-    let docs: Doc[] = text.split(/[\t\n\f\r ]+/);
+    let docs: Doc = text.split(/[\t\n\f\r ]+/);
 
-    docs = join(line, docs).parts.filter((s) => s !== '');
+    docs = ensureArray(join(line, docs)).filter((doc) => !isEmptyDoc(doc));
 
     if (startsWithLinebreak(text)) {
         docs[0] = hardline;

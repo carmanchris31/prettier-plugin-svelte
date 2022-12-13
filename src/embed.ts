@@ -21,12 +21,12 @@ const {
     utils: { removeLines },
 } = doc;
 
-export function embed(_path: FastPath, _options: ParserOptions) {
+export function embed(path: FastPath, options: ParserOptions) {
     return async (
         textToDoc: (text: string, options: Options) => Promise<Doc>,
         print: (selector?: string | number | Array<string | number> | FastPath) => Doc,
-        path: FastPath,
-        options: ParserOptions,
+        _path: FastPath,
+        _options: Options,
     ) => {
         const node: Node = path.getNode();
 
@@ -104,7 +104,7 @@ export function embed(_path: FastPath, _options: ParserOptions) {
             }
         }
 
-        return null;
+        return undefined;
     };
 }
 
